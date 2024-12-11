@@ -4,7 +4,30 @@ metadata:
   name: {{ include "grafana.fullname" . }}-config
 data:
   datasources.yaml: |
-{{ toYaml .Values.datasources }}
+    apiVersion: 1
+    datasources:
+    - name: Mimir
+      type: prometheus
+      url: http://mimir.edge-stack.svc.cluster.local:9009 # Change this to your Prometheus service address
+      # url: {? {.Values.prometheus.url | quote: ''} : ''}
+      access: proxy
+      isDefault: true
 
   providers.yaml: |
-{{ toYaml .Values.providers }}
+    apiVersion: 1
+    providers:
+    - name: 'RED Metrics (classic histogram)'
+      type: file
+      options:
+        path: /otel-lgtm/grafana-dashboard-red-metrics-classic.json
+        foldersFromFilesStructure: false
+    - name: 'RED Metrics (exponential/native histogram)'
+      type: file
+      options:
+        path: /otel-lgtm/grafana-dashboard-red-metrics-native.json
+        foldersFromFilesStructure: false
+    - name: 'JVM Metrics'
+      type: file
+      options:
+        path: /otel-lgtm/grafana-dashboard-jvm-metrics.json
+        foldersFromFilesStructure: false
